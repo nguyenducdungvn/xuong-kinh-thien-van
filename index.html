@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Ứng dụng miễn phí cho người Việt: học thiên văn từ con số không, thiết kế và tự chế kính thiên văn, ước tính chi phí, giả lập quan sát, bầu trời đêm nay, dự báo hiện tượng và nhật ký quan sát.">
+<meta name="theme-color" content="#0c1220">
+<meta name="application-name" content="Xưởng kính">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Xưởng kính">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:title" content="Xưởng kính thiên văn">
+<meta property="og:description" content="Học thiên văn, tự chế kính thiên văn và xem bầu trời đêm nay. Miễn phí, tiếng Việt, chạy offline.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thienvan.hlvsuckhoe.com/">
+<meta property="og:image" content="https://thienvan.hlvsuckhoe.com/icons/icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/logo.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Xưởng kính thiên văn</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Spectral:wght@500;600;700&display=swap">
+<style>
+/* Bố cục: thanh đầu dính + 6 tab theo trình tự Học → Thiết kế → Chế tạo → Quan sát → Bầu trời → Hệ Mặt Trời; Nhà xưởng là bảng điều khiển trái + kết quả phải. Tông đêm đài quan sát, nhấn màu đồng thau. */
+:root{--bg:#0c1220;--card:#131b2d;--card2:#19233a;--bd:#27334c;--fg:#e6e9f0;--mu:#9aa4b8;--ac:#dba852;--hi:#f0b85a;--ok:#5cc98a;--bad:#ff8a7a;--sky:#05070d;
+--fd:"Spectral",Georgia,"Times New Roman",serif;--fb:"Be Vietnam Pro","Segoe UI",system-ui,sans-serif;--fm:"JetBrains Mono",ui-monospace,Consolas,monospace;color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3f5f9;--card:#ffffff;--card2:#edf0f6;--bd:#d3d9e4;--fg:#141a28;--mu:#566074;--ac:#8a5a10;--hi:#a8610a;--ok:#1b7a44;--bad:#b3261e;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f3f5f9;--card:#ffffff;--card2:#edf0f6;--bd:#d3d9e4;--fg:#141a28;--mu:#566074;--ac:#8a5a10;--hi:#a8610a;--ok:#1b7a44;--bad:#b3261e;color-scheme:light}
+html.red{filter:grayscale(1) sepia(1) saturate(6) hue-rotate(-38deg) brightness(.62)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 var(--fb)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd)}
+.brand{display:flex;align-items:center;gap:12px;padding-block:12px 4px;flex-wrap:wrap}
+.brand h1{font:700 1.45rem/1.15 var(--fd);margin:0;letter-spacing:.01em;text-wrap:balance}
+.brand .sub{color:var(--mu);font-size:.85rem;flex:1;min-width:200px}
+.chip{font:500 .78rem/1 var(--fm);border:1px solid var(--bd);border-radius:999px;padding:6px 10px;color:var(--mu);background:var(--card);white-space:nowrap}
+button.tgl{font:600 .8rem/1 var(--fb);border:1px solid var(--bd);background:var(--card);color:var(--fg);padding:7px 11px;border-radius:999px;cursor:pointer}
+button.tgl[aria-pressed="true"]{background:#7a1d14;color:#ffd9d2;border-color:#7a1d14}
+nav#tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding-block:4px 0}
+nav#tabs::-webkit-scrollbar{display:none}
+nav#tabs button{flex:none;border:0;border-bottom:2px solid transparent;background:none;color:var(--mu);padding:9px 12px;font:600 .9rem/1.2 var(--fb);cursor:pointer;display:flex;gap:7px;align-items:baseline}
+nav#tabs button i{font:500 .7rem/1 var(--fm);font-style:normal;opacity:.75}
+nav#tabs button.on{color:var(--fg);border-bottom-color:var(--ac)}
+nav#tabs button:hover{color:var(--fg)}
+main{padding-block:18px 40px}
+main>section{display:none}main>section.on{display:block}
+.lead{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin:4px 0 16px}
+.lead h2{font:600 1.6rem/1.2 var(--fd);margin:0;text-wrap:balance}
+.lead p{margin:4px 0 0;color:var(--mu);max-width:68ch}
+h2{font:600 1.15rem/1.3 var(--fd);margin:0 0 8px;text-wrap:balance}
+h3{font:600 .78rem/1.3 var(--fb);letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin:16px 0 6px}
+p.s,.s{color:var(--mu);font-size:.88rem;margin:4px 0 0;max-width:70ch}
+.g{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.g2{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))}
+.g>*,.g2>*{min-width:0}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;min-width:0}
+.span{grid-column:1/-1}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.ws{display:grid;gap:16px;grid-template-columns:320px minmax(0,1fr);align-items:start}
+.ws aside{position:sticky;top:110px;max-height:calc(100vh - 124px);overflow:auto}
+@media (max-width:860px){.ws{grid-template-columns:1fr}.ws aside{position:static;max-height:none}}
+label{display:block;font-size:.84rem;color:var(--mu);margin:10px 0 3px}
+select,input[type=number],input[type=datetime-local]{width:100%;font:inherit;padding:7px 8px;background:var(--card2);color:var(--fg);border:1px solid var(--bd);border-radius:6px}
+input[type=range]{width:100%;accent-color:var(--ac)}
+input[type=checkbox],input[type=radio]{accent-color:var(--ac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.ck{display:flex;gap:8px;align-items:center;margin:3px 0;color:var(--fg);font-size:.9rem;cursor:pointer}
+.ck input{flex:none}.ck span{flex:1}.ck em{color:var(--mu);font:400 .78rem var(--fm);font-style:normal}
+.m{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.m div{border:1px solid var(--bd);border-radius:8px;padding:9px 10px;background:var(--card2)}
+.m b{display:block;font:600 1.12rem/1.2 var(--fm);color:var(--ac);font-variant-numeric:tabular-nums}.m small{color:var(--mu);font-size:.78rem;line-height:1.3;display:block;margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+td,th{padding:6px 6px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--mu);font-size:.78rem;letter-spacing:.03em}
+td:last-child,th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.tot{font:700 1.15rem var(--fm);color:var(--hi)}
+.w{color:var(--bad);font-size:.88rem;margin:4px 0}.okk{color:var(--ok)}
+.sc{overflow-x:auto}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.kpi div{background:var(--card2);border:1px solid var(--bd);border-radius:8px;padding:12px}
+.kpi b{display:block;font:700 1.4rem/1.2 var(--fm);font-variant-numeric:tabular-nums}
+.kpi small{color:var(--mu)}
+#vw{width:min(100%,420px);aspect-ratio:1;border-radius:50%;overflow:hidden;background:#000;margin:8px auto;border:8px solid var(--card2);box-shadow:0 0 0 1px var(--bd);position:relative;max-width:100%}
+#cv{width:100%;height:100%;display:block}
+#dg{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;color:#ff8a80;padding:40px;font-weight:600}
+button.b{background:var(--ac);color:var(--bg);border:0;padding:8px 13px;border-radius:6px;font:600 .88rem var(--fb);cursor:pointer}
+button.b.gh{background:var(--card2);color:var(--fg);border:1px solid var(--bd)}
+.tag{display:inline-block;font:500 .72rem/1.5 var(--fm);border:1px solid var(--bd);border-radius:4px;padding:0 6px;margin-right:6px;color:var(--mu)}
+ol,ul{padding-left:20px}li{margin:5px 0}
+.pt{cursor:pointer}.pt *{fill:var(--card);stroke:var(--fg);stroke-width:1.4}.pt.on *{fill:var(--ac);fill-opacity:.3;stroke:var(--ac)}.pt.off *{stroke-dasharray:4 3;opacity:.5}.pt.sel *{stroke:var(--hi);stroke-width:3}
+.nbg{cursor:pointer}.nbg circle{fill:var(--hi);stroke:none}.nbg text{fill:var(--bg);font:700 10px sans-serif;text-anchor:middle;stroke:none}
+.dgw svg{width:100%;max-width:520px;display:block;margin:auto}.lg{columns:2 200px;padding:0;list-style:none;font-size:.88rem}.lg li{cursor:pointer;margin:3px 0}.lg li:hover{color:var(--ac)}.inf{border:1px solid var(--bd);border-radius:8px;padding:10px;margin-top:8px;font-size:.9rem;background:var(--card2)}
+.sd *{fill:none;stroke:var(--fg);stroke-width:1.2}.sd .m{fill:var(--ac);fill-opacity:.3;stroke:var(--ac)}.sd text{fill:var(--fg);stroke:none;font:11px var(--fb)}
+.cvs{width:100%;max-width:440px;display:block;margin:auto;background:var(--sky);border-radius:10px}
+.sd .rb{stroke:#3b82f6}.sd .ro{stroke:#f59e0b}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sum{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline;justify-content:space-between}
+.les{display:grid;grid-template-columns:270px minmax(0,1fr);gap:18px;margin-top:12px}
+@media (max-width:760px){.les{grid-template-columns:1fr}}
+.lnav{display:flex;flex-direction:column;gap:2px}
+.lnav h3{margin:10px 0 4px}
+.lnav button{text-align:left;border:0;background:none;color:var(--fg);padding:6px 8px;border-radius:6px;font:500 .88rem/1.35 var(--fb);cursor:pointer;display:flex;gap:8px}
+.lnav button span{font:500 .75rem/1.6 var(--fm);color:var(--mu);min-width:1.6em}
+.lnav button.on{background:var(--card2);box-shadow:inset 2px 0 0 var(--ac)}
+.lnav button.dn span{color:var(--ok)}
+.lbody{min-width:0;max-width:76ch}
+.story{border-left:2px solid var(--ac);padding-left:12px;font-family:var(--fd);font-size:1.02rem}
+.q{border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin:10px 0;background:var(--card2)}
+.q p{margin:0 0 6px}
+.bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+footer{border-top:1px solid var(--bd);color:var(--mu);font-size:.82rem;padding-block:16px 28px}
+footer details{margin-top:6px}footer summary{cursor:pointer}
+.seg{display:flex;gap:4px;flex-wrap:wrap}.seg button{border:1px solid var(--bd);background:var(--card2);color:var(--fg);padding:6px 10px;border-radius:999px;font:600 .82rem var(--fb);cursor:pointer}.seg button.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+details.ph{border:1px solid var(--bd);border-radius:8px;margin:8px 0;background:var(--card2)}details.ph summary{cursor:pointer;padding:10px 12px;display:flex;gap:10px;align-items:baseline;list-style:none}details.ph summary::-webkit-details-marker{display:none}
+details.ph summary .pn{font:600 .8rem var(--fm);color:var(--ac);min-width:1.4em}details.ph summary b{flex:1}details.ph summary em{font:400 .78rem var(--fm);font-style:normal;color:var(--mu)}details.ph[open] summary{border-bottom:1px solid var(--bd)}details.ph ol{margin:8px 12px 8px 8px;padding-left:28px}
+.tip{margin:0 12px 10px;padding:8px 10px;border-radius:6px;background:var(--card);font-size:.88rem;border-left:2px solid var(--ok)}
+.ev{display:grid;grid-template-columns:78px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--bd)}.evd b{display:block;font:600 1.15rem var(--fm)}.evd small{color:var(--mu);font:400 .76rem var(--fm)}.ev p{margin:2px 0 6px}
+button.sm,.b.sm{padding:5px 9px;font-size:.78rem}
+.je{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--bd)}.je img,.jph{width:96px;height:96px;border-radius:50%;background:var(--sky);display:block}
+.cmpt td,.cmpt th{text-align:right;min-width:150px}.cmpt td:first-child,.cmpt th:first-child{text-align:left;min-width:170px}
+textarea,input[type=text],input[type=search]{width:100%;font:inherit;padding:7px 8px;background:var(--card2);color:var(--fg);border:1px solid var(--bd);border-radius:6px}
+label.b{cursor:pointer}
+@media (max-width:640px){.je{grid-template-columns:64px minmax(0,1fr)}.je img,.jph{width:64px;height:64px}}
+.abh{display:flex;gap:16px;align-items:center}.abh img{border-radius:20px;flex:none}
+.dng{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px}.dn{text-align:center}.dn p{margin-left:auto;margin-right:auto}
+.qr{width:min(215px,70%);height:auto;background:#fff;border-radius:12px;padding:6px;border:1px solid var(--bd);display:block;margin:10px auto}
+.mono{font-family:var(--fm)}a{color:var(--ac)}footer a{color:inherit}
+a.b{display:inline-block;text-decoration:none;color:var(--bg);background:var(--ac);padding:8px 13px;border-radius:6px;font:600 .88rem/1.3 var(--fb)}a.b.gh{color:var(--fg);background:var(--card2);border:1px solid var(--bd)}
+button.tgl[aria-current="page"]{border-color:var(--ac);color:var(--ac)}
+.fgrid{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+#sv{max-width:560px;display:block;margin:auto}
+@media (max-width:640px){.brand .sub{display:none}.brand h1{font-size:1.25rem;flex:1}.lead h2{font-size:1.35rem}#pobserve .ws aside{order:2}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<div class="brand"><h1>Xưởng kính thiên văn</h1><span class="sub">Học, thiết kế, chế tạo và quan sát thử bằng chính chiếc kính bạn dựng.</span><span class="chip" id="locchip">Hà Nội</span><button class="tgl" data-go="about" id="abtn">Giới thiệu</button><button class="tgl" id="nmode" aria-pressed="false" title="Lọc đỏ giữ thị lực ban đêm khi dùng ngoài trời">Đèn đỏ</button></div>
+<nav id="tabs" aria-label="Các phần"><button data-t="learn" class="on"><i>1</i>Học</button><button data-t="design"><i>2</i>Thiết kế</button><button data-t="build"><i>3</i>Chế tạo</button><button data-t="observe"><i>4</i>Quan sát thử</button><button data-t="sky"><i>5</i>Bầu trời đêm nay</button><button data-t="solar"><i>6</i>Hệ Mặt Trời</button><button data-t="log"><i>7</i>Nhật ký</button></nav>
+</div></header>
+<main class="wrap">
+
+<section id="plearn" class="on">
+<div class="lead"><div><h2>Bắt đầu từ con số không</h2><p>Bốn thẻ dưới đây đủ để hiểu mọi con số trong ứng dụng. Sau đó học theo chương trình 14 bài, mỗi bài có câu chuyện lịch sử, máy tính thực hành và 5 câu hỏi.</p></div><button class="b" data-go="design">Sang bước 2: Thiết kế kính</button></div>
+<div class="g2">
+<div class="c"><h2>Kính thiên văn làm gì?</h2><p>Về bản chất, kính là cái phễu hứng ánh sáng. Nó làm ba việc: <b>thu sáng</b> (thấy vật mờ), <b>phân giải</b> (tách hai chi tiết sát nhau) và <b>phóng đại</b>. Quan trọng nhất là <b>khẩu độ</b>, tức đường kính gương hoặc thấu kính chính. Phóng đại chỉ là phần phụ: phóng quá mức chỉ cho ảnh to nhưng mờ.</p><h3>Bốn công thức dễ nhớ</h3><ol><li>Phóng đại = tiêu cự kính ÷ tiêu cự thị kính. Kính 1.000 mm với thị kính 10 mm cho 100×.</li><li>Tỷ số f = tiêu cự ÷ khẩu độ. f nhỏ cho trường nhìn rộng; f lớn dễ cho ảnh hành tinh nét và dễ chỉnh quang hơn.</li><li>Độ thu sáng tăng theo bình phương khẩu độ: kính 200 mm thu gấp khoảng 1,8 lần kính 150 mm.</li><li>Phóng đại hữu ích tối đa khoảng 2 × khẩu độ (mm); ở Hà Nội khí quyển thường giới hạn ở 150–250×.</li></ol></div>
+<div class="c"><h2>Ba loại kính</h2><p><b>Khúc xạ:</b> dùng thấu kính, ảnh sắc nét, ít phải bảo dưỡng, nhưng đắt theo khẩu độ và có viền màu. Không tự mài được thấu kính; bạn chỉ làm ống và giá.</p><p><b>Newton / Dobson:</b> rẻ nhất trên mỗi mm khẩu độ, có thể tự mài gương. Hợp nhất với người có đồ mộc và gia công kim loại; cần học chỉnh quang.</p><p><b>Schmidt-Cassegrain (SCT):</b> ống ngắn gọn nhưng tiêu cự dài, đắt, không tự chế quang học được; bạn chỉ làm giá và phụ kiện.</p></div>
+<div class="c"><h2>Thuật ngữ hay gặp</h2><p><b>Tiêu cự:</b> khoảng cách từ gương/thấu kính chính tới điểm hội tụ ảnh. <b>Seeing:</b> độ rung của khí quyển làm ảnh nhòe, tính bằng giây cung (″). <b>Chỉnh quang (collimation):</b> căn các gương thẳng trục. <b>Alt-az:</b> giá xoay lên-xuống và ngang. <b>Xích đạo:</b> giá có trục song song trục quay Trái Đất, theo sao bằng một chuyển động. <b>Xung đối:</b> lúc một hành tinh ngoài đối diện Mặt Trời, gần và sáng nhất. <b>Cấp sao (mag):</b> số càng nhỏ càng sáng.</p></div>
+<div class="c"><h2>Sai lầm người mới hay gặp</h2><ol><li>Mua kính quảng cáo “600×” khẩu độ 50 mm: ảnh to nhưng mờ, giá đỡ yếu.</li><li>Giá đỡ rung lắc: giá đỡ tốt quan trọng ngang ống kính.</li><li>Chỉ nghĩ tới hành tinh, quên rằng bầu trời thành phố che khuất vật mờ.</li><li>Nhìn Mặt Trời không có màng lọc phía trước ống kính: gây mù vĩnh viễn.</li></ol></div>
+<div class="c span"><h2>Các bộ phận của kính</h2><div class="row"><label for="kt" style="margin:0">Loại kính</label><select id="kt" style="max-width:280px"></select></div><div id="kd" style="margin-top:8px"></div></div>
+<div class="c span" id="cur"></div>
+<div class="c span"><h2>Lộ trình thực hành 6 bước</h2><ol>
+<li>Làm quen bầu trời bằng mắt thường và tab Bầu trời đêm nay; nhận ra Mặt Trăng, Kim tinh, Mộc tinh.</li>
+<li>Quan sát Mặt Trăng ở 50×; ghi chép các hố và biển tối.</li>
+<li>Theo dõi 4 vệ tinh Galileo của Mộc tinh qua nhiều đêm, vẽ vị trí.</li>
+<li>Quan sát vành đai Sao Thổ ở 100×–150×.</li>
+<li>Chụp ảnh bằng điện thoại gắn thị kính, ghép nhiều khung hình.</li>
+<li>Quan sát Mặt Trời an toàn bằng màng lọc, đếm vết đen mỗi ngày.</li></ol></div>
+</div></section>
+
+<section id="pdesign">
+<div class="lead"><div><h2>Nhà xưởng thiết kế</h2><p>Chọn cấu hình ở cột trái; mọi thông số, chi phí và bản vẽ bên phải cập nhật ngay.</p></div><button class="b" data-go="build">Sang bước 3: Chế tạo</button></div>
+<div class="ws">
+<aside class="c"><h2>Cấu hình</h2>
+<label for="st">Loại kính</label><select id="st"></select>
+<label for="sd">Khẩu độ (mm)</label><select id="sd"></select>
+<label for="sf">Tỷ số tiêu cự f/</label><select id="sf"></select>
+<label for="sm">Giá đỡ</label><select id="sm"></select><div id="mi" style="display:flex;gap:10px;align-items:center;margin-top:6px"></div>
+<h3>Thị kính</h3><div id="eps"></div>
+<h3>Phụ kiện</h3><div id="exs"></div>
+<h3>Hiệu chỉnh giá</h3><label for="pf">Hệ số giá so với ước tính: <b id="pfv">1,00</b>×</label><input id="pf" type="range" min="0.6" max="1.6" step="0.05" value="1"><p class="s">Kéo để khớp với báo giá bạn nhận được ở cửa hàng.</p>
+</aside>
+<div class="stack">
+<div class="c"><div class="sum"><h2 id="cfgname">Cấu hình</h2><span class="s" id="cfgsub"></span></div><div class="m" id="met" style="margin-top:8px"></div><div id="wn" style="margin-top:8px"></div></div>
+<div class="c"><h2>Chi phí ước tính</h2><div class="kpi" id="cmp"></div>
+<div class="g" style="margin-top:12px"><div><h3>Tự chế</h3><div class="sc"><table id="cA"></table></div></div><div><h3>Mua sẵn</h3><div class="sc"><table id="cB"></table></div></div></div>
+<p class="s" id="pnote"></p></div>
+<div class="c" id="cmpc"></div>
+<div class="c"><h2>Độ phóng đại theo thị kính</h2><div class="sc"><table id="mt"></table></div></div>
+<div class="g2"><div class="c"><h2>Sơ đồ bố trí linh kiện</h2><p class="s">Bấm số hoặc tên để đọc về từng linh kiện. Nét đứt mờ là phụ kiện tùy chọn chưa chọn; màu đồng là đã chọn.</p><div id="wd"></div></div>
+<div class="c"><h2>Bản vẽ tỉ lệ và kích thước</h2><p class="s">Đúng tỉ lệ tương đối giữa chiều dài ống, đường kính ống và gương. Vùng màu là quang học; nét đứt là chụp chống sương.</p><svg id="sv" class="sd" viewBox="0 0 420 200" style="width:100%"></svg><div class="sc"><table id="dm"></table></div><p class="s" id="dn"></p></div></div>
+<div class="c"><h2>Đường đi của ánh sáng</h2><svg id="rv" class="sd" viewBox="0 0 420 250" style="width:100%;max-width:600px;display:block;margin:auto"></svg><p class="s"><span style="color:#3b82f6">■</span> Chùm sáng từ tâm vật (trên trục) &nbsp; <span style="color:#f59e0b">■</span> Chùm từ mép vật (lệch trục)</p><ol id="rl"></ol></div>
+</div></div></section>
+
+<section id="pbuild">
+<div class="lead"><div><h2>Chế tạo</h2><p id="bsub">Quy trình, bản vẽ cắt gỗ, mài gương và chỉnh quang cho cấu hình bạn chọn ở bước 2.</p></div><button class="b gh" data-go="design">Đổi cấu hình</button></div>
+<div class="g2">
+<div class="c span" id="guide"></div>
+<div class="c span" id="bomc"></div>
+<div class="c span"><div class="sum"><h2>Bản vẽ cắt gỗ</h2><button class="b" id="cb">Tạo bản vẽ cắt gỗ</button></div><p class="s">Chi tiết gỗ cho cấu hình đang chọn (ván ép 18 mm). Đổi cấu hình thì bản vẽ tự cập nhật.</p><div id="cut" class="sc" style="margin-top:10px"></div><p class="s">Chú thích: vòng nhỏ là lỗ khoan (Ø6,5 mm cho bu lông M6, cách mép 20 mm; Ø8 mm ở tâm ván đáy; 3 lỗ đặt đệm Teflon cách tâm 35% đường kính ván). Nét chấm là hướng thớ gỗ mặt ngoài: tấm bên đặt thớ theo chiều đứng để chịu lực, các tấm còn lại thớ nằm ngang theo cạnh dài.</p></div>
+<div class="c"><h2>Máy tính mài gương Newton</h2><p class="s">Theo khẩu độ và tỉ số f đang chọn.</p><div class="sc"><table id="mm"></table></div><h3>Bảng thử Foucault (nguồn sáng đi cùng dao)</h3><div class="sc"><table id="fz"></table></div><canvas id="fc" width="160" height="160" style="display:block;margin:10px auto;border-radius:50%"></canvas><label for="kn">Vị trí dao cắt: <span id="kv">0</span> mm so với tiêu điểm vùng giữa</label><input id="kn" type="range" min="0" max="100" value="40"></div>
+<div class="c"><h2>Chỉnh quang Newton</h2><canvas id="cc" width="240" height="240" style="width:100%;max-width:240px;display:block;margin:auto;border-radius:50%"></canvas><p class="s">Nhìn xuống bộ chỉnh nét: vòng xám là ống, xanh là gương phụ, vàng là phản chiếu gương chính, đỏ là phản chiếu gương phụ và lỗ nhìn.</p><label for="c1">Nghiêng gương phụ (vít gương phụ)</label><input id="c1" type="range" min="-20" max="20" value="12"><label for="c2">Nghiêng gương chính (vít đáy gương)</label><input id="c2" type="range" min="-20" max="20" value="-9"><p id="cs" style="font-weight:600"></p><ol><li>Chuẩn bị laser hoặc nắp Cheshire; đặt kính trong nhà, ban ngày.</li><li>Chỉnh 3 vít gương phụ để phản chiếu gương chính nằm giữa gương phụ.</li><li>Chỉnh 3 vít gương chính để phản chiếu gương phụ và lỗ nhìn nằm giữa chấm tâm gương.</li><li>Kiểm tra bằng sao: ảnh sao lệch tiêu cự phải là các vòng tròn đồng tâm.</li></ol></div>
+</div></section>
+
+<section id="pobserve">
+<div class="lead"><div><h2>Quan sát thử</h2><p>Nhìn qua chiếc kính bạn vừa thiết kế. Chế độ “theo ngày thật” dùng vị trí và giờ ở tab Bầu trời đêm nay để tính kích thước, pha và độ nghiêng vành Sao Thổ.</p></div></div>
+<div class="ws">
+<aside class="c"><h2>Điều khiển</h2>
+<label for="tg">Mục tiêu</label><select id="tg"></select>
+<label for="eo">Thị kính đang dùng</label><select id="eo"></select>
+<label class="ck" style="margin-top:12px"><input type="checkbox" id="rl2" checked><span>Theo ngày thật (kích thước, pha, vệ tinh)</span></label>
+<label for="sg">Seeing: <span id="sgv"></span>″ (càng nhỏ càng tốt; Hà Nội thường 2–4″)</label><input id="sg" type="range" min="0.8" max="6" step="0.1" value="2.5">
+<div id="phw"><label for="ph">Pha: <span id="phv"></span>%</label><input id="ph" type="range" min="3" max="100" value="60"></div>
+<p class="s" id="si" style="margin-top:12px"></p></aside>
+<div class="c"><div id="vw"><canvas id="cv" width="420" height="420"></canvas><div id="dg"></div></div><p class="s" style="text-align:center">Ảnh mô phỏng; kính thật thường cho ảnh lộn ngược hoặc lật gương.</p></div>
+</div></section>
+
+<section id="psky">
+<div class="lead"><div><h2>Bầu trời đêm nay</h2><p>Chọn nơi và giờ quan sát. Vị trí này dùng chung cho Quan sát thử và mô phỏng các mùa.</p></div></div>
+<div class="g2">
+<div class="c"><h2>Nơi và giờ quan sát</h2><label for="lp">Địa điểm có sẵn</label><select id="lp"></select><div class="g" style="gap:10px"><div><label for="la">Vĩ độ (°, Bắc dương)</label><input id="la" type="number" step="0.01" value="21.03"></div><div><label for="lo">Kinh độ (°, Đông dương)</label><input id="lo" type="number" step="0.01" value="105.85"></div></div><label for="ld">Thời điểm (để trống = bây giờ)</label><input id="ld" type="datetime-local"><p class="row" style="margin-top:10px"><button class="b" id="ln">Về bây giờ</button><button class="b gh" id="lg">Dùng vị trí của tôi</button></p><p class="s" id="ev"></p></div>
+<div class="c"><h2>Thiên thể trên trời</h2><div class="sc"><table id="sk"></table></div></div>
+<div class="c"><h2>Bản đồ vòm trời</h2><p class="s">Giơ lên đầu mà nhìn: phía trên là Bắc, bên trái là Đông. Tâm là thiên đỉnh, vòng ngoài là chân trời.</p><canvas id="dm2" width="420" height="420" class="cvs" style="margin-top:8px"></canvas><div class="row" style="margin-top:6px"><label class="ck"><input type="checkbox" id="dml" checked><span>Nối chòm sao</span></label><label class="ck"><input type="checkbox" id="dmn" checked><span>Tên sao và chòm sao</span></label></div><label for="dh">Dịch thời gian (giờ, −12 đến +12)</label><input id="dh" type="range" min="-12" max="12" value="0"><label for="dy">Dịch ngày (−180 đến +180, xem sao đổi theo mùa)</label><input id="dy" type="range" min="-180" max="180" value="0"><p class="s" id="dv"></p></div>
+<div class="c" id="obs"></div>
+<div class="c span" id="evc"></div>
+</div></section>
+
+<section id="psolar">
+<div class="lead"><div><h2>Hệ Mặt Trời</h2><p>Quỹ đạo theo ngày thật, pha Mặt Trăng, nhật nguyệt thực, các mùa và thẻ thông tin từng thiên thể.</p></div></div>
+<div class="g2">
+<div class="c"><h2>Hệ Mặt Trời chuyển động</h2><canvas id="oc" width="420" height="420" class="cvs"></canvas><div class="g" style="gap:10px"><div><label for="os">Tốc độ</label><select id="os"></select></div><div><label for="oz">Tỉ lệ khoảng cách</label><select id="oz"><option value="c">Nén cho dễ nhìn</option><option value="r">Tỉ lệ thực</option></select></div></div><p class="row" style="margin:10px 0"><button class="b" id="ob">Tạm dừng</button> <span id="ot" class="s"></span></p><div class="m" id="ov"></div><p class="s">Hành tinh càng gần Mặt Trời càng quay nhanh (định luật Kepler): Thủy tinh một vòng 88 ngày, Hải Vương tinh 165 năm. Kích thước hành tinh được phóng to để dễ thấy.</p></div>
+<div class="c"><h2>Pha và bóng của Mặt Trăng</h2><canvas id="mc" width="420" height="260" class="cvs"></canvas><div style="display:flex;gap:12px;align-items:center;margin-top:8px"><canvas id="mp" width="120" height="120" style="border-radius:50%;flex:none"></canvas><div id="mi2"></div></div><label for="md">Ngày trong chu kỳ</label><input id="md" type="range" min="0" max="29.5" step="0.1" value="0"><div class="g" style="gap:10px"><div><label for="ms">Tốc độ</label><select id="ms"></select></div><div style="align-self:end"><button class="b" id="mb">Tạm dừng</button></div></div><label class="ck"><input type="checkbox" id="mk" checked><span>Quỹ đạo Trăng nghiêng 5° (thực tế)</span></label><p class="s">Mặt Trăng luôn được chiếu sáng một nửa; ta thấy phần sáng đổi dạng vì góc nhìn từ Trái Đất thay đổi. Một chu kỳ pha dài 29,5 ngày. Quỹ đạo Trăng nghiêng 5° nên chỉ vài lần mỗi năm mới thẳng hàng; bỏ chọn ô nghiêng để thấy nếu quỹ đạo phẳng thì tháng nào cũng có thực. Đây là mô hình minh họa, không dự báo ngày thực thật.</p></div>
+<div class="c"><h2>Đứng trên Mặt Trăng nhìn Trái Đất</h2><canvas id="lc" width="420" height="260" class="cvs"></canvas><label for="ml">Kinh độ của bạn trên Mặt Trăng: <span id="lov">0</span>° (0° = ngay dưới Trái Đất, ±90° = mép mặt gần)</label><input id="ml" type="range" min="-180" max="180" value="0"><p class="s" id="li"></p><p class="s">Thời gian chạy cùng mô phỏng pha bên cạnh. Kích thước Trái Đất và Mặt Trời được phóng to.</p></div>
+<div class="c"><h2>Vì sao có các mùa</h2><canvas id="sc2" width="420" height="300" class="cvs"></canvas><label for="sdr">Ngày trong năm: <span id="sdv"></span></label><input id="sdr" type="range" min="1" max="365" value="1"><button class="b" id="sbt">Chạy</button><p class="s" id="sti"></p></div>
+</div>
+<h2 style="margin:22px 0 10px">Thông tin từng thiên thể</h2><div class="g" id="ss"></div>
+</section>
+<section id="plog">
+<div class="lead"><div><h2>Nhật ký quan sát</h2><p>Ghi mỗi buổi quan sát: mục tiêu, kính, thị kính, điều kiện trời và một hình phác họa. Ghi Mặt Trăng, Mộc tinh, Thổ tinh, Kim tinh hay Hỏa tinh sẽ tự đánh dấu thử thách tương ứng.</p></div></div>
+<p class="s" id="jst" style="margin:-6px 0 12px">Đang lưu trong trình duyệt này.</p>
+<div class="ws">
+<aside class="c"><form id="jfm"><h2>Mục nhật ký</h2>
+<label for="jd">Ngày giờ</label><input id="jd" type="datetime-local">
+<label for="jl">Địa điểm</label><input id="jl" type="text" maxlength="80">
+<div class="g" style="gap:10px"><div><label for="jtg">Mục tiêu</label><select id="jtg"></select></div><div><label for="jtx">Tên cụ thể (tùy chọn)</label><input id="jtx" type="text" maxlength="120" placeholder="VD: M42, Albireo"></div></div>
+<label for="jsc">Kính</label><input id="jsc" type="text" maxlength="120">
+<label for="jep">Thị kính, phóng đại</label><select id="jep"></select>
+<div class="g" style="gap:10px"><div><label for="jse">Seeing (thang Antoniadi)</label><select id="jse"></select></div><div><label for="jtr">Độ trong (1 mờ – 5 rất trong)</label><select id="jtr"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div></div>
+<label for="jno">Ghi chú</label><textarea id="jno" rows="4" maxlength="3000" placeholder="Thấy gì, chi tiết nào rõ, khó khăn gì…"></textarea>
+<label>Phác họa (vẽ bằng chuột hoặc ngón tay)</label><canvas id="jsk" width="240" height="240" style="width:100%;max-width:240px;display:block;border-radius:50%;touch-action:none;cursor:crosshair"></canvas>
+<div class="row" style="margin-top:6px"><label class="ck"><input type="checkbox" id="jer"><span>Tẩy</span></label><button type="button" class="b gh sm" id="jskc">Xóa hình</button></div>
+<p class="row" style="margin-top:12px"><button class="b" id="jsv" type="submit">Lưu mục nhật ký</button><button type="button" class="b gh" id="jcn" hidden>Hủy sửa</button></p><p class="s" id="jm"></p></form></aside>
+<div class="stack">
+<div class="c"><div class="kpi" id="jsum"></div></div>
+<div class="c"><div class="sum"><h2>Các buổi đã ghi</h2><div class="row"><input id="jq" type="search" placeholder="Tìm trong ghi chú" style="width:auto;min-width:0;flex:1;font:inherit;padding:7px 8px;background:var(--card2);color:var(--fg);border:1px solid var(--bd);border-radius:6px"><select id="jf" style="width:auto"></select></div></div><div id="jls" style="margin-top:10px"></div></div>
+<div class="c"><h2>Sao lưu và chuyển máy</h2><p class="s">Tải nhật ký về máy (CSV mở bằng Excel; JSON dùng để nhập lại vào ứng dụng ở thiết bị khác hoặc bản offline).</p><div class="row" style="margin-top:8px"><button class="b gh" id="jxc">Tải CSV</button><button class="b gh" id="jxj">Tải JSON</button><label class="b gh" for="jim" style="margin:0;color:var(--fg);display:inline-block">Nhập từ JSON</label><input id="jim" type="file" accept=".json,application/json" hidden></div><p class="s" id="jxm"></p></div>
+</div></div></section>
+<section id="pabout">
+<div class="lead"><div><h2>Giới thiệu và ủng hộ</h2><p>Xưởng kính thiên văn là ứng dụng miễn phí để học thiên văn, thiết kế và tự chế kính thiên văn, rồi ra trời quan sát thật.</p></div><button class="b gh" data-go="learn">Về trang Học</button></div>
+<div class="g2">
+<div class="c abh"><img src="img/logo.svg" alt="Logo Xưởng kính thiên văn" width="84" height="84"><div><h2>Xưởng kính thiên văn</h2><p class="s">Phiên bản <b class="ver"></b> · Học thiên văn và tự chế kính cho người Việt</p><p class="s">Thuộc hệ sinh thái <a href="https://hlvsuckhoe.com/" target="_blank" rel="noopener">hlvsuckhoe.com</a>, cùng ứng dụng <a href="https://app.hlvsuckhoe.com/" target="_blank" rel="noopener">HLV Sức Khỏe</a>.</p></div></div>
+<div class="c"><h2>Cảm ơn bạn đã sử dụng</h2><p>Ứng dụng được làm ra với mong muốn ai cũng có thể bắt đầu ngắm bầu trời và tự tay làm chiếc kính đầu tiên: miễn phí, không quảng cáo, không thu thập dữ liệu. Tiến độ học, nhật ký và các cấu hình bạn lưu nằm ngay trên máy của bạn.</p></div>
+<div class="c span"><div class="dng">
+<div class="dn"><h2>Mời người phát triển một ly cà phê</h2><p class="s">Nếu bạn thấy ứng dụng hữu ích và muốn ủng hộ người phát triển duy trì, cải tiến, bạn có thể chuyển khoản tùy tâm qua mã VietQR dưới đây. Mọi sự ủng hộ đều là động lực rất lớn. Xin chân thành cảm ơn!</p><img class="qr" src="img/qr_ung_ho.png" alt="Mã VietQR ủng hộ: BIDV 3210256468, NGUYEN DUC DUNG" width="215" height="275"><p><b>NGUYEN DUC DUNG</b><br>BIDV · <b class="mono">3210256468</b></p><p class="row" style="justify-content:center"><button class="b gh" data-copy="3210256468" data-msg="abm">Chép số tài khoản</button></p><p class="s">Mở ứng dụng ngân hàng → Quét QR (hoặc chụp màn hình rồi chọn ảnh QR). Ủng hộ là hoàn toàn tự nguyện; ứng dụng vẫn miễn phí đầy đủ tính năng.</p></div>
+<div class="dn"><h2>Ủng hộ từ nước ngoài qua PayPal</h2><p class="s">Mở PayPal → <b>Gửi tiền</b> → nhập email bên dưới → chọn số tiền và đơn vị tiền tệ của bạn.</p><p class="mono" style="font-size:1.05rem"><b>ndd.phateco@gmail.com</b></p><p class="row" style="justify-content:center"><a class="b" href="https://www.paypal.com/myaccount/transfer/homepage/pay" target="_blank" rel="noopener">Mở PayPal</a><button class="b gh" data-copy="ndd.phateco@gmail.com" data-msg="abm">Chép email PayPal</button></p></div>
+</div><p class="s" id="abm" style="text-align:center"></p></div>
+<div class="c"><h2>Chia sẻ ứng dụng</h2><p>Gửi link này cho người thân, bạn bè cùng ngắm trời:<br><b class="mono" id="abu" style="word-break:break-all"></b></p><p class="row"><button class="b" id="absh">Chia sẻ</button><button class="b gh" id="abcp">Chép link</button><a class="b gh" id="abgh" href="https://github.com/nddzungx/xuong-kinh-thien-van" target="_blank" rel="noopener">Trang GitHub</a></p><p class="s" id="abm2"></p></div>
+<div class="c"><h2>Liên hệ, góp ý</h2><p>Mọi góp ý, báo lỗi, đề xuất tính năng xin gửi về: <b class="mono">nddzungx@gmail.com</b></p><p class="row"><a class="b gh" id="abml" href="mailto:nddzungx@gmail.com">Gửi email</a><button class="b gh" data-copy="nddzungx@gmail.com" data-msg="abm3">Chép địa chỉ</button></p><p class="s" id="abm3"></p><p class="s">Báo lỗi trên GitHub: mục Issues của repo xuong-kinh-thien-van.</p></div>
+<div class="c span"><h2>Cách dùng nhanh</h2><ol>
+<li><b>Học:</b> đọc 4 thẻ kiến thức nền, xem các bộ phận của kính, rồi học 14 bài theo 3 cấp (đúng từ 3/5 câu là qua bài).</li>
+<li><b>Thiết kế:</b> chọn loại kính, khẩu độ, tỷ số f, giá đỡ, thị kính, phụ kiện. Xem thông số, chi phí tham khảo, bản vẽ; lưu tối đa 3 cấu hình để so sánh.</li>
+<li><b>Chế tạo:</b> hướng dẫn chi tiết từng giai đoạn cho cả ba loại kính, danh sách vật tư, bản vẽ cắt gỗ, máy tính mài gương, mô phỏng chỉnh quang.</li>
+<li><b>Quan sát thử:</b> nhìn Mặt Trăng và các hành tinh qua chính chiếc kính bạn thiết kế, theo kích thước và pha thật của ngày đã chọn.</li>
+<li><b>Bầu trời đêm nay:</b> chọn nơi và giờ; xem thiên thể nào đang lên, bản đồ vòm trời, thử thách quan sát và dự báo hiện tượng 1–3 năm tới.</li>
+<li><b>Hệ Mặt Trời:</b> quỹ đạo theo ngày thật, pha Mặt Trăng, nhật nguyệt thực, các mùa, thẻ thông tin từng thiên thể.</li>
+<li><b>Nhật ký:</b> ghi mỗi buổi quan sát kèm hình phác họa; tải CSV/JSON để sao lưu hoặc chuyển máy.</li></ol>
+<h3>Cài lên điện thoại</h3><p><b>iPhone:</b> mở link bằng Safari → nút Chia sẻ → <b>Thêm vào MH chính</b>. <b>Android:</b> mở bằng Chrome → <b>Cài đặt ứng dụng</b> (hoặc menu ⋮ → Thêm vào màn hình chính). Lần đầu cần mạng; sau đó dùng được cả khi không có mạng. Nút <b>Đèn đỏ</b> giữ mắt quen bóng tối khi dùng ngoài trời.</p></div>
+<div class="c span"><h2>Miễn trừ trách nhiệm và an toàn</h2><ol>
+<li>Ứng dụng cung cấp kiến thức và mô phỏng <b>mang tính giáo dục</b>. Vị trí thiên thể, ngày giờ sự kiện, kích thước và chi phí là <b>ước tính</b>; hãy đối chiếu nguồn chính thức khi cần độ chính xác cao.</li>
+<li><b>Không bao giờ nhìn Mặt Trời</b> qua kính thiên văn, ống nhòm, finder hay bằng mắt thường khi không có màng lọc Mặt Trời đạt chuẩn ISO 12312-2 gắn chắc ở phía trước ống kính. Có thể gây mù vĩnh viễn ngay lập tức.</li>
+<li>Khi cắt gỗ, gia công kim loại, mài kính: đeo kính bảo hộ, khẩu trang, găng tay phù hợp; dùng dụng cụ điện đúng hướng dẫn của nhà sản xuất. Trẻ em cần người lớn đi kèm.</li>
+<li>Giá chỉ mang tính tham khảo, quy đổi từ giá quốc tế; giá thực tế tùy cửa hàng, thời điểm và phí vận chuyển.</li>
+<li>Quan sát ban đêm: chọn nơi an toàn, báo cho người thân, chú ý giao thông và thời tiết.</li></ol></div>
+<div class="c span"><h2>Nguồn dữ liệu và công thức</h2><ul>
+<li>Vị trí hành tinh: yếu tố quỹ đạo Kepler xấp xỉ (bảng của JPL, dùng tốt 1800–2050).</li>
+<li>Mặt Trăng, vệ tinh Mộc tinh, độ nghiêng vành Sao Thổ, nhật nguyệt thực: công thức rút gọn theo Jean Meeus, <i>Astronomical Algorithms</i>.</li>
+<li>Kết quả đã được đối chiếu với thư viện mã nguồn mở Astronomy Engine (Don Cross): hành tinh sai dưới 0,2°, Mặt Trăng khoảng 0,2°, ngày nhật nguyệt thực và xung đối trùng khớp, giờ lệch vài phút đến vài giờ.</li>
+<li>Tọa độ sao: danh mục sao sáng J2000, đối chiếu thư viện PyEphem. Ngày cực đại mưa sao băng: giá trị trung bình hằng năm.</li>
+<li>Giá tham khảo: giá bán lẻ quốc tế của các mẫu phổ biến quy đổi theo tỷ giá khoảng 26.300 đ/USD cộng phí nhập khẩu.</li></ul></div>
+<div class="c span"><h2>Bản quyền</h2><p>© 2026 Nguyễn Đức Dũng (nddzungx@gmail.com). Bảo lưu mọi quyền. Bạn được dùng miễn phí cho mục đích cá nhân, gia đình, học tập, phi thương mại. Không sao chép, sửa đổi để phân phối lại hoặc dùng cho mục đích thương mại khi chưa có sự đồng ý bằng văn bản của tác giả. Xem tệp LICENSE trên GitHub.</p></div>
+</div></section>
+</main>
+<footer><div class="wrap"><div class="fgrid"><div><b>Xưởng kính thiên văn</b> · Phiên bản <span class="ver">1.9.0</span> (21/11/2026)<br>© 2026 Nguyễn Đức Dũng · nddzungx@gmail.com · Bảo lưu mọi quyền.</div><div><a href="#about">Giới thiệu và ủng hộ</a> · <a href="https://hlvsuckhoe.com/" target="_blank" rel="noopener">hlvsuckhoe.com</a> · <a href="https://app.hlvsuckhoe.com/" target="_blank" rel="noopener">HLV Sức Khỏe</a> · <a href="https://github.com/nddzungx/xuong-kinh-thien-van" target="_blank" rel="noopener">GitHub</a></div></div>
+Vị trí hành tinh đã đối chiếu với thư viện Astronomy Engine: sai dưới 0,2° trong khoảng 1800–2050; Mặt Trăng khoảng 0,2°. Giá chỉ mang tính tham khảo. Dùng cho học tập.
+<details><summary>Lịch sử phiên bản</summary>1.0 nhà xưởng và giả lập · 1.1 kiến thức nền · 1.2 bản vẽ tỉ lệ, quỹ đạo, pha Mặt Trăng · 1.3 bản vẽ cắt gỗ, đường đi ánh sáng, bầu trời theo vị trí, nhìn từ Mặt Trăng · 1.4 mài gương, chỉnh quang, chương trình học · 1.5 bản đồ vòm trời, 9 bài học · 1.6 sao theo mùa, các mùa, thử thách quan sát, 14 bài học · 1.7 sửa bảng chi phí bị trống, bố cục 6 bước, xáo trộn đáp án, Mặt Trăng chính xác hơn, kích thước/pha/vành Sao Thổ/vệ tinh Mộc tinh theo ngày thật, cập nhật mô hình giá, chế độ đèn đỏ, sửa một số dữ kiện lịch sử · 1.8 hướng dẫn chế tạo chi tiết cho cả ba loại kính, danh sách vật tư và nơi mua, so sánh 3 cấu hình, dự báo hiện tượng thiên văn, nhật ký quan sát có phác họa và sao lưu. · 1.9.0 đưa lên GitHub Pages thành ứng dụng cài được, chạy offline (PWA); thêm trang Giới thiệu, mời cà phê (VietQR, PayPal), chia sẻ, liên hệ, cách dùng nhanh, nguồn dữ liệu; nút dùng vị trí của thiết bị; liên kết với hlvsuckhoe.com.</details></div></footer>
+<script src="js/app.js"></script>
+<script>if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&location.hostname!=='localhost'){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+</body>
+</html>

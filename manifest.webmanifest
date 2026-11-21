@@ -1,0 +1,17 @@
+{
+ "name": "Xưởng kính thiên văn",
+ "short_name": "Xưởng kính",
+ "description": "Học thiên văn, thiết kế và tự chế kính thiên văn, giả lập quan sát, bầu trời đêm nay, dự báo hiện tượng và nhật ký quan sát cho người Việt.",
+ "lang": "vi",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#0c1220",
+ "theme_color": "#0c1220",
+ "icons": [
+  {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+  {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+  {"src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+ ]
+}

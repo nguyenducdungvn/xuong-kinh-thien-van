@@ -1,0 +1,19 @@
+Xưởng kính thiên văn
+Copyright (c) 2026 Nguyễn Đức Dũng (nddzungx@gmail.com). Bảo lưu mọi quyền / All rights reserved.
+
+1. Bạn được phép sử dụng ứng dụng miễn phí cho mục đích cá nhân, gia đình, học tập, phi thương mại.
+2. Không được sao chép, sửa đổi để phân phối lại, bán, cho thuê, tích hợp vào sản phẩm/dịch vụ thương mại,
+   hoặc tái xuất bản nội dung (bài học, hướng dẫn chế tạo, bản vẽ, mã nguồn) khi chưa có sự đồng ý bằng văn bản của tác giả.
+3. Ứng dụng được cung cấp "nguyên trạng" (AS IS), không kèm bất kỳ bảo đảm nào. Vị trí thiên thể, ngày giờ sự kiện,
+   kích thước và giá chỉ là ước tính. Tác giả không chịu trách nhiệm về thiệt hại phát sinh từ việc sử dụng, kể cả khi
+   chế tạo kính hoặc quan sát Mặt Trời. Không bao giờ nhìn Mặt Trời khi không có màng lọc đạt chuẩn ISO 12312-2.
+
+Permission is granted to use this application free of charge for personal, educational, non-commercial purposes only.
+Redistribution, modification for redistribution, or commercial use requires prior written permission from the author.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+------------------------------------------------------------------------------
+Nguồn tham khảo / References
+Công thức thiên văn rút gọn theo Jean Meeus, "Astronomical Algorithms"; yếu tố quỹ đạo xấp xỉ của JPL (E. M. Standish).
+Kết quả được đối chiếu (không nhúng mã) với Astronomy Engine của Don Cross (MIT License) và PyEphem.
+Phông chữ Be Vietnam Pro, Spectral, JetBrains Mono tải từ Google Fonts (SIL Open Font License 1.1).
