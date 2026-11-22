@@ -388,7 +388,7 @@ $('#jim').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileRe
 jList();jInit()}
 
 // ===== v1.9: Giới thiệu, ủng hộ, chia sẻ; vị trí thiết bị =====
-const VERSION='1.9.0',APP_URL='https://thienvan.hlvsuckhoe.com/',REPO_URL='https://github.com/nddzungx/xuong-kinh-thien-van',EMAIL='nddzungx@gmail.com';
+const VERSION='1.9.1',APP_URL='https://thienvan.hlvsuckhoe.com/',REPO_URL='https://github.com/nddzungx/xuong-kinh-thien-van',EMAIL='nddzungx@gmail.com';
 document.querySelectorAll('.ver').forEach(e=>e.textContent=VERSION);$('#abu').textContent=APP_URL;$('#abgh').href=REPO_URL;$('#abml').href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Góp ý Xưởng kính thiên văn v'+VERSION);
 document.addEventListener('click',e=>{const c=e.target.closest('[data-copy]');if(c)copyText(c.dataset.copy,'#'+(c.dataset.msg||'abm'))});
 $('#abcp').onclick=()=>copyText(APP_URL,'#abm2');

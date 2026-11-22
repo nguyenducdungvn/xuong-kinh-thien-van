@@ -12,7 +12,7 @@ Không cần cài thêm thư viện nào (chỉ dùng Python 3 chuẩn).
 import base64, hashlib, json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-FILES = ["./", "./index.html", "./js/app.js", "./manifest.webmanifest", "./img/logo.svg", "./img/qr_ung_ho.png",
+FILES = ["./", "./index.html", "./js/app.js", "./js/install-guide.js", "./manifest.webmanifest", "./img/logo.svg", "./img/qr_ung_ho.png",
          "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-512-maskable.png",
          "./icons/apple-touch-icon.png", "./icons/favicon-32.png"]
 
@@ -51,6 +51,8 @@ def make_single():
     html = re.sub(r'<link rel="(manifest|apple-touch-icon)"[^>]*>\n?', "", html)
     html = re.sub(r'<link rel="icon" href="icons/[^>]*>\n?', "", html)
     html = re.sub(r"<script>if\('serviceWorker'.*?</script>\n?", "", html, flags=re.S)
+    ig = (ROOT / "js/install-guide.js").read_text(encoding="utf-8")
+    html = html.replace('<script src="js/install-guide.js"></script>', "<script>\n" + ig.replace("</script", "<\\/script") + "\n</script>")
     html = html.replace('<script src="js/app.js"></script>', "<script>\n" + js.replace("</script", "<\\/script") + "\n</script>")
     html = html.replace('src="img/logo.svg"', 'src="' + data_uri("img/logo.svg", "image/svg+xml") + '"')
     html = html.replace('href="img/logo.svg"', 'href="' + data_uri("img/logo.svg", "image/svg+xml") + '"')

@@ -52,6 +52,7 @@ Nếu thấy hữu ích, bạn có thể mời người phát triển một ly c
 Nội dung mang tính giáo dục; vị trí, ngày giờ, kích thước và giá là ước tính. **Không bao giờ nhìn Mặt Trời** khi không có màng lọc đạt chuẩn ISO 12312-2 gắn chắc phía trước ống kính. Đeo đồ bảo hộ khi cắt gỗ, gia công kim loại, mài kính.
 
 ## Phiên bản
+- **1.9.1** (22/11/2026): hướng dẫn cài lên điện thoại chi tiết (nút trong Giới thiệu và chân trang, mở thẳng bằng `thienvan.hlvsuckhoe.com/#cai-dat`); liên kết Tôi & Gia Đình. Tệp mới `js/install-guide.js` (đã thêm vào `tools/build.py`).
 - **1.9.0** (21/11/2026): đưa lên GitHub Pages, cài được và chạy offline; trang Giới thiệu, mời cà phê (VietQR, PayPal), chia sẻ, liên hệ, cách dùng nhanh; dùng vị trí thiết bị; liên kết với hlvsuckhoe.com.
 - **1.8** (03/11/2026): hướng dẫn chế tạo chi tiết cho cả ba loại kính, vật tư và nơi mua, so sánh 3 cấu hình, dự báo hiện tượng, nhật ký quan sát.
 - **1.7** (02/11/2026): sửa bảng chi phí trống, bố cục 6 bước, xáo trộn đáp án, Mặt Trăng chính xác hơn, quan sát theo ngày thật, đèn đỏ.
